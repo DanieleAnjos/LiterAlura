@@ -1,13 +1,6 @@
 package com.alura.LiterAlura.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,17 +14,20 @@ public class Livro {
     private Long id;
 
     private String titulo;
-    private String idiomas;
     private Integer numeroDownloads;
 
     @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Autor> autores = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "livro_idiomas", joinColumns = @JoinColumn(name = "livro_id"))
+    @Column(name = "idioma")
+    private List<String> idiomas = new ArrayList<>();
+
     public Livro() {}
 
     public Livro(DadosLivro dadosLivro) {
         this.titulo = dadosLivro.titulo();
-        this.idiomas = dadosLivro.idiomas();
         this.numeroDownloads = dadosLivro.numeroDownloads();
     }
 
@@ -51,11 +47,11 @@ public class Livro {
         this.titulo = titulo;
     }
 
-    public String getIdiomas() {
+    public List<String> getIdiomas() {
         return idiomas;
     }
 
-    public void setIdiomas(String idiomas) {
+    public void setIdiomas(List<String> idiomas) {
         this.idiomas = idiomas;
     }
 
@@ -78,12 +74,20 @@ public class Livro {
         }
     }
 
+    public void addAutor(Autor autor) {
+        this.autores.add(autor);
+    }
+
+    public void removeAutor(Autor autor) {
+        this.autores.remove(autor);
+    }
+
     @Override
     public String toString() {
         return "Livro{" +
                 "id=" + id +
                 ", titulo='" + titulo + '\'' +
-                ", idiomas='" + idiomas + '\'' +
+                ", idiomas=" + idiomas +
                 ", numeroDownloads=" + numeroDownloads +
                 '}';
     }
